@@ -9,7 +9,9 @@ defmodule Redoc.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       name: "Redoc",
-      source_url: "https://github.com/wingyplus/redoc_ui_plug"
+      source_url: "https://github.com/wingyplus/redoc_ui_plug",
+      package: package(),
+      description: description()
     ]
   end
 
@@ -25,6 +27,18 @@ defmodule Redoc.MixProject do
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:open_api_spex, "~> 3.10"},
       {:jason, "~> 1.0"}
+    ]
+  end
+
+  defp description do
+    "The Elixir package to render Redoc UI from OpenAPI specification."
+  end
+
+  defp package do
+    [
+      name: "redoc_ui_plug", 
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/wingyplus/redoc_ui_plug"}
     ]
   end
 end
