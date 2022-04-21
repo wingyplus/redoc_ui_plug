@@ -23,7 +23,7 @@ defmodule Redoc.MixProject do
 
   defp deps do
     [
-      {:plug, "~> 1.0"}, 
+      {:plug, "~> 1.0"},
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:open_api_spex, "~> 3.10"},
       {:jason, "~> 1.0"}
@@ -36,7 +36,7 @@ defmodule Redoc.MixProject do
 
   defp package do
     [
-      name: "redoc_ui_plug", 
+      name: "redoc_ui_plug",
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/wingyplus/redoc_ui_plug"}
     ]
