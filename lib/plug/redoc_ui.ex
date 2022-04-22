@@ -4,31 +4,12 @@ defmodule Redoc.Plug.RedocUI do
 
   ## Usage
 
-  If you're using Phoenix Framework and using `open_api_spex`, first
-  you need to replace `OpenApiSpex.Plug.RenderSpec` with:
-
-  ```elixir
-  scope "/api" do
-    get "/openapi", Redoc.Plug.RenderSpec, []
-    ...
-  end
-  ```
-
-  After that, add Redoc UI by add this plug to the router:
+  If you're using Phoenix Framework, add Redoc UI by add this plug to the router:
 
   ```elixir
   scope "/api" do
     ...
-    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi"
-  end
-  ```
-
-  So the final router scope would looks like:
-
-  ```elixir
-  scope "/api" do
-    get "/openapi", Redoc.Plug.RenderSpec, []
-    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi"
+    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi" 
   end
   ```
 
