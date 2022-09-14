@@ -9,7 +9,7 @@ defmodule Redoc.Plug.RedocUI do
   ```elixir
   scope "/api" do
     ...
-    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi"
+    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi" 
   end
   ```
 
