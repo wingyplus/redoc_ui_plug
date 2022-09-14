@@ -9,7 +9,7 @@ defmodule Redoc.Plug.RedocUI do
   ```elixir
   scope "/api" do
     ...
-    get "/redoc", Redoc.Plug.RedocUI, spec: "/spec/openapi" 
+    get "/redoc", Redoc.Plug.RedocUI, spec_url: "/spec/openapi"
   end
   ```
 
@@ -39,16 +39,12 @@ defmodule Redoc.Plug.RedocUI do
   </html>
   """
 
-  @supported_opts [
-    :spec_url,
-    :redoc_version
-  ]
-
   @impl true
   def init(opts) do
-    # TODO: validate mandatory fields.
-    Keyword.take(opts, @supported_opts)
-    |> Keyword.validate!([:spec_url, redoc_version: "latest"])
+    spec_url = Keyword.fetch!(opts, :spec_url)
+    redoc_version = Keyword.get(opts, :redoc_version, "latest")
+
+    %{spec_url: spec_url, redoc_version: redoc_version}
   end
 
   @impl true
