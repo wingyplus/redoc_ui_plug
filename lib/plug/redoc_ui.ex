@@ -51,7 +51,7 @@ defmodule Redoc.Plug.RedocUI do
     spec_url = Keyword.fetch!(opts, :spec_url)
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
 
-    %{spec_url: spec_url, redoc_version: redoc_version}
+    [spec_url: spec_url, redoc_version: redoc_version]
   end
 
   @impl true
