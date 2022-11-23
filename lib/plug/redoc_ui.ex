@@ -51,12 +51,13 @@ defmodule Redoc.Plug.RedocUI do
     spec_url = Keyword.fetch!(opts, :spec_url)
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
 
-    %{spec_url: spec_url, redoc_version: redoc_version}
+    [spec_url: spec_url, redoc_version: redoc_version]
   end
 
   @impl true
   def call(conn, opts) do
     conn
+    |> put_resp_content_type("text/html")
     |> send_resp(200, EEx.eval_string(@index_html, opts))
   end
 end
