@@ -17,6 +17,7 @@ defmodule Redoc.Plug.RedocUI do
 
   * `spec_url` - The openapi path to fetch. Support both `yaml` and `json`.
   * `redoc_version` - Specify a Redoc version, default to `latest`.
+  * `title` - The documentation HTML page title, default to `ReDoc`.
   """
 
   @behaviour Plug
@@ -27,7 +28,7 @@ defmodule Redoc.Plug.RedocUI do
   <!doctype html>
   <html>
     <head>
-      <title>ReDoc</title
+      <title><%= title %></title
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
@@ -50,8 +51,9 @@ defmodule Redoc.Plug.RedocUI do
   def init(opts) do
     spec_url = Keyword.fetch!(opts, :spec_url)
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
+    title = Keyword.get(opts, :title, "ReDoc")
 
-    [spec_url: spec_url, redoc_version: redoc_version]
+    [spec_url: spec_url, redoc_version: redoc_version, title: title]
   end
 
   @impl true
