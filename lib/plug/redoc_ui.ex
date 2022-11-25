@@ -32,6 +32,13 @@ defmodule Redoc.Plug.RedocUI do
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,700|Roboto:300,400,700" rel="stylesheet">
+
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+        }
+      </style>
     </head>
     <body>
       <redoc spec-url="<%= spec_url %>"></redoc>
@@ -46,12 +53,13 @@ defmodule Redoc.Plug.RedocUI do
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
     title = Keyword.get(opts, :title, "ReDoc")
 
-    %{spec_url: spec_url, redoc_version: redoc_version, title: title}
+    [spec_url: spec_url, redoc_version: redoc_version, title: title]
   end
 
   @impl true
   def call(conn, opts) do
     conn
+    |> put_resp_content_type("text/html")
     |> send_resp(200, EEx.eval_string(@index_html, opts))
   end
 end
