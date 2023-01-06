@@ -108,12 +108,8 @@ defmodule Redoc.Plug.RedocUI do
   end
 
   defp encode_options(opts) do
-    Enum.reduce(opts, [], fn {key, value}, acc ->
-      case Enum.member?(@redoc_options, key) do
-        true -> [{to_kebab_case(key), value} | acc]
-        false -> acc
-      end
-    end)
+    Keyword.take(opts, @redoc_options)
+    |> Enum.map(fn {key, value} -> {to_kebab_case(key), value} end)
   end
 
   defp to_kebab_case(identifier) do
