@@ -41,19 +41,65 @@ defmodule Redoc.Plug.RedocUI do
       </style>
     </head>
     <body>
-      <redoc spec-url="<%= spec_url %>"></redoc>
+      <redoc
+        <%= for {k, v} <- redoc_opts do %>
+         <%= k %>="<%= v %>"
+        <% end %>
+      ></redoc>
       <script src="https://cdn.jsdelivr.net/npm/redoc@<%= Plug.HTML.html_escape(redoc_version) %>/bundles/redoc.standalone.js"></script>
     </body>
   </html>
   """
 
+  @redoc_options [
+    :disable_search,
+    :download_definition_url,
+    :download_file_name,
+    :expand_default_server_variables,
+    :expand_responses,
+    :expand_single_schema_field,
+    :generated_payload_samples_max_depth,
+    :hide_download_button,
+    :hide_fab,
+    :hide_hostname,
+    :hide_loading,
+    :hide_schema_pattern,
+    :hide_schema_titles,
+    :hide_single_request_sample_tab,
+    :json_sample_expand_level,
+    :lazy_rendering,
+    :max_displayed_enum_values,
+    :menu_toggle,
+    :min_character_length_to_init_search,
+    :native_scrollbars,
+    :nonce,
+    :only_required_in_samples,
+    :path_in_middle_panel,
+    :payload_sample_idx,
+    :required_props_first,
+    :schema_expansion_level,
+    :scroll_y_offset,
+    :show_extensions,
+    :show_object_schema_examples,
+    :show_webhook_ver,
+    :side_nav_style,
+    :simple_one_of_type_label,
+    :sort_enum_values_alphabetically,
+    :sort_operations_alphabetically,
+    :sort_props_alphabetically,
+    :sort_tags_alphabetically,
+    :spec_url,
+    :theme,
+    :untrusted_spec
+  ]
+
   @impl true
   def init(opts) do
-    spec_url = Keyword.fetch!(opts, :spec_url)
+    redoc_opts = encode_options(opts)
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
     title = Keyword.get(opts, :title, "ReDoc")
 
-    [spec_url: spec_url, redoc_version: redoc_version, title: title]
+    [redoc_opts: redoc_opts, redoc_version: redoc_version, title: title]
   end
 
   @impl true
@@ -61,5 +107,16 @@ defmodule Redoc.Plug.RedocUI do
     conn
     |> put_resp_content_type("text/html")
     |> send_resp(200, EEx.eval_string(@index_html, opts))
+  end
+
+  defp encode_options(opts) do
+    Keyword.take(opts, @redoc_options)
+    |> Enum.map(fn {key, value} -> {to_kebab_case(key), value} end)
+  end
+
+  defp to_kebab_case(identifier) do
+    identifier
+    |> to_string()
+    |> String.replace("_", "-")
   end
 end
