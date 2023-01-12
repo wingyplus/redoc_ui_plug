@@ -1,4 +1,29 @@
 defmodule Redoc.Plug.RedocUI do
+  @plug_options_schema [
+    title: [
+      type: :string,
+      default: "ReDoc",
+      doc: "Custom ReDoc site title."
+    ],
+    spec_url: [
+      type: :string,
+      doc: "Open API spec URL.",
+      deprecated: "Use `:spec_url` in `:redoc_opts` instead."
+    ],
+    redoc_version: [
+      type: :string,
+      default: "latest",
+      doc: "Specify ReDoc version"
+    ],
+    redoc_options: [
+      type: :keyword_list,
+      keys: Redoc.options_schema(),
+      doc: """
+      ReDoc options. See https://github.com/Redocly/redoc#redoc-options-object for more details.
+      """
+    ]
+  ]
+
   @moduledoc """
   A Plug for rendering Redoc UI.
 
@@ -15,9 +40,7 @@ defmodule Redoc.Plug.RedocUI do
 
   ## Options
 
-  * `spec_url` - The openapi path to fetch. Support both `yaml` and `json`.
-  * `redoc_version` - Specify a Redoc version, default to `latest`.
-  * `title` - The documentation HTML page title, default to `ReDoc`.
+  #{NimbleOptions.docs(@plug_options_schema)}
   """
 
   @behaviour Plug
@@ -42,8 +65,8 @@ defmodule Redoc.Plug.RedocUI do
     </head>
     <body>
       <redoc
-        <%= for {k, v} <- redoc_opts do %>
-         <%= k %>="<%= v %>"
+        <%= for {k, v} <- redoc_options do %>
+          <%= k %>="<%= v %>"
         <% end %>
       ></redoc>
       <script src="https://cdn.jsdelivr.net/npm/redoc@<%= Plug.HTML.html_escape(redoc_version) %>/bundles/redoc.standalone.js"></script>
@@ -51,55 +74,23 @@ defmodule Redoc.Plug.RedocUI do
   </html>
   """
 
-  @redoc_options [
-    :disable_search,
-    :download_definition_url,
-    :download_file_name,
-    :expand_default_server_variables,
-    :expand_responses,
-    :expand_single_schema_field,
-    :generated_payload_samples_max_depth,
-    :hide_download_button,
-    :hide_fab,
-    :hide_hostname,
-    :hide_loading,
-    :hide_schema_pattern,
-    :hide_schema_titles,
-    :hide_single_request_sample_tab,
-    :json_sample_expand_level,
-    :lazy_rendering,
-    :max_displayed_enum_values,
-    :menu_toggle,
-    :min_character_length_to_init_search,
-    :native_scrollbars,
-    :nonce,
-    :only_required_in_samples,
-    :path_in_middle_panel,
-    :payload_sample_idx,
-    :required_props_first,
-    :schema_expansion_level,
-    :scroll_y_offset,
-    :show_extensions,
-    :show_object_schema_examples,
-    :show_webhook_ver,
-    :side_nav_style,
-    :simple_one_of_type_label,
-    :sort_enum_values_alphabetically,
-    :sort_operations_alphabetically,
-    :sort_props_alphabetically,
-    :sort_tags_alphabetically,
-    :spec_url,
-    :theme,
-    :untrusted_spec
-  ]
-
   @impl true
   def init(opts) do
-    redoc_opts = encode_options(opts)
-    redoc_version = Keyword.get(opts, :redoc_version, "latest")
-    title = Keyword.get(opts, :title, "ReDoc")
+    case NimbleOptions.validate(opts, @plug_options_schema) do
+      {:ok, opts} ->
+	# Honor spec_url in the root of the `opts`.
+        redoc_options =
+          (opts[:redoc_options] || [])
+          |> maybe_merge_spec_url(opts[:spec_url])
+          |> encode_options()
 
-    [redoc_opts: redoc_opts, redoc_version: redoc_version, title: title]
+        opts
+        |> Keyword.delete(:redoc_options)
+        |> Keyword.put(:redoc_options, redoc_options)
+
+      otherwise ->
+        otherwise
+    end
   end
 
   @impl true
@@ -109,9 +100,14 @@ defmodule Redoc.Plug.RedocUI do
     |> send_resp(200, EEx.eval_string(@index_html, opts))
   end
 
-  defp encode_options(opts) do
-    Keyword.take(opts, @redoc_options)
-    |> Enum.map(fn {key, value} -> {to_kebab_case(key), value} end)
+  defp maybe_merge_spec_url(redoc_options, nil), do: redoc_options
+
+  defp maybe_merge_spec_url(redoc_options, spec_url),
+    do: Keyword.merge(redoc_options, spec_url: spec_url)
+
+  # TODO: need test.
+  defp encode_options(redoc_options) do
+    Enum.map(redoc_options, fn {key, value} -> {to_kebab_case(key), value} end)
   end
 
   defp to_kebab_case(identifier) do
