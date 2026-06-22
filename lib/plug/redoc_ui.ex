@@ -46,7 +46,7 @@ defmodule Redoc.Plug.RedocUI do
          <%= k %>="<%= v %>"
         <% end %>
       ></redoc>
-      <script src="https://cdn.jsdelivr.net/npm/redoc@<%= Plug.HTML.html_escape(redoc_version) %>/bundles/redoc.standalone.js"></script>
+      <script src="<%= redoc_url %>"></script>
     </body>
   </html>
   """
@@ -99,7 +99,12 @@ defmodule Redoc.Plug.RedocUI do
     redoc_version = Keyword.get(opts, :redoc_version, "latest")
     title = Keyword.get(opts, :title, "ReDoc")
 
-    [redoc_opts: redoc_opts, redoc_version: redoc_version, title: title]
+    default_url =
+      "https://cdn.jsdelivr.net/npm/redoc@#{Plug.HTML.html_escape(redoc_version)}/bundles/redoc.standalone.js"
+
+    redoc_url = Keyword.get(opts, :redoc_url, default_url)
+
+    [redoc_opts: redoc_opts, redoc_url: redoc_url, title: title]
   end
 
   @impl true
