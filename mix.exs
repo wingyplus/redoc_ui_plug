@@ -25,6 +25,7 @@ defmodule Redoc.MixProject do
     [
       {:plug, "~> 1.0"},
       {:jason, "~> 1.0"},
+      {:nimble_options, "~> 0.3"},
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
     ]
   end
